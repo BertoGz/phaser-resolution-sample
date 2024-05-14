@@ -1,6 +1,6 @@
 # Phaser Resolution Sample
 
-Welcome to Phaser Resolution Sample! built this demo to understand how to build a pixel-perfect game.
+Welcome to Phaser Resolution Sample! I built this demo to understand how to build a pixel-perfect game.
 
 ## Installation
 
