@@ -1,15 +1,29 @@
 import Phaser from "phaser";
 import Player from "./Prefabs/Player";
 import SmoothCamera from "./Classes/SmoothCamera";
-
+const aspect = 1920 / 1080;
 const UPSCALE_FACTOR = 4;
-const GAME_WIDTH = 320 * UPSCALE_FACTOR;
-const GAME_HEIGHT = (320 * UPSCALE_FACTOR) / 1.78;
-
+const GAME_WIDTH = 360 * UPSCALE_FACTOR;
+const GAME_HEIGHT = (360 / 1.78) * UPSCALE_FACTOR; /// aspect;
+let lastDiffX = 0;
+let lastDiffY = 0;
 let tiles = [];
+let trees = [];
+function roundTo4Halfs(number, halfs = 1) {
+  return Math.floor(number * halfs) / halfs;
+}
+
+function myRound(num, precision = 1) {
+  return Math.round(num * Math.pow(10, precision)) / Math.pow(10, precision);
+}
+function roundToPrecision(value, precision) {
+  var multiplier = Math.pow(10, precision);
+  return Math.round(value * multiplier) / multiplier;
+}
 
 class Scene extends Phaser.Scene {
   preload() {
+    //this.game.renderer.setTextureFilter(Phaser.Textures.FilterMode.LINEAR)
     // load game assets
     this.load.spritesheet("char_sprite", "./assets/monster-ghost.png", {
       frameWidth: 32,
@@ -19,10 +33,14 @@ class Scene extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
+    this.load.image("tree", "./assets/tree.png");
   }
+
   create() {
     //create camera
     this.camera = new SmoothCamera(this, 0, 0);
+    //   this.camera.roundPixels = false;
+
     this.camera.setZoom(UPSCALE_FACTOR);
 
     // make render texture for grass tiles
@@ -35,6 +53,7 @@ class Scene extends Phaser.Scene {
       },
       true
     );
+
     //align render texture to top left
     this.renderTexture.setOrigin(0, 0);
     this.renderTexture.setScrollFactor(0, 0);
@@ -52,31 +71,61 @@ class Scene extends Phaser.Scene {
         tiles.push(newTile);
       }
     }
-
+    const tree = new Phaser.GameObjects.Image(this, 100, 100, "tree");
+    trees.push(tree);
     // create player
-    this.player = new Player(this, 0, 0);
+    this.player = new Player(this, 0, 0, { moveSpeed: 1 });
     this.player.setDepth(10);
-
+    this.camera.startFollow(this.player, false, 0.05);
     //set player as camera target
-    this.camera.setTarget(this.player, 0.01);
+    //this.camera.setTarget(this.player, 1);
   }
-  update() {
-    this.player.update();
-
+  postDraw() {
+    const newCam = {
+      x: roundTo4Halfs(this.camera.scrollX, 1),
+      y: roundTo4Halfs(this.camera.scrollY, 1),
+    };
     // prepare render texture
     this.renderTexture.clear();
 
     //batch draw grass texture
     this.renderTexture.beginDraw();
     tiles.forEach((t) => {
-      this.renderTexture.batchDraw(
-        t,
-        t.x - this.camera.scrollX,
-        t.y - this.camera.scrollY
-      );
+      this.renderTexture.batchDraw(t, t.x - newCam.x, t.y - newCam.y);
     });
     this.renderTexture.endDraw();
+    this.renderTexture.beginDraw();
+
+    trees.forEach((t) => {
+      this.renderTexture.batchDraw(t, t.x - newCam.x, t.y - newCam.y);
+    });
+    this.renderTexture.endDraw();
+
+    true &&
+      this.renderTexture.draw(
+        this.player,
+        this.player.x - newCam.x,
+        this.player.y - newCam.y
+      );
+    this.renderTexture.endDraw();
+    const diffX = Math.round(newCam.x) - this.camera.scrollX;
+    const diffY = Math.round(newCam.y) - this.camera.scrollY;
+    this.renderTexture.x = diffX; // roundTo4Halfs(diffX, 2);
+    this.renderTexture.y = diffY; //roundTo4Halfs(diffY, 2);
+    //this.renderTexture.
   }
+  update(time, delta) {
+    this.player.update(time, delta);
+
+    //  this.camera.scrollX = roundTo4Halfs(this.camera.scrollX, UPSCALE_FACTOR-1);
+    //  this.camera.scrollY = roundTo4Halfs(this.camera.scrollY, UPSCALE_FACTOR-1);
+    requestAnimationFrame(() => {
+      this.postDraw();
+    });
+
+    //  this.renderTexture.y = .5
+  }
+  preUpdate() {}
 }
 
 const phaserConfig = {
@@ -90,6 +139,10 @@ const phaserConfig = {
   },
   physics: {
     default: "arcade",
+  },
+  fps: {
+    target: 60,
+    forceSetTimeOut: true,
   },
   scene: [Scene],
   pixelArt: true,
