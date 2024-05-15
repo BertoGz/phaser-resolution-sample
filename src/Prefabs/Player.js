@@ -1,8 +1,9 @@
 import Phaser from "phaser";
+import { lerp } from "../Functions/lerp";
 class MovementHandler {
   constructor(gameObject, config = { moveSpeed: 1 }) {
     this.gameObject = gameObject;
-    this.moveSpeed = config.moveSpeed;
+    // this.moveSpeed = config.moveSpeed;
     this.keyA = gameObject.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.A
     );
@@ -15,17 +16,48 @@ class MovementHandler {
     this.keyS = gameObject.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.S
     );
+    this.maxSpeed = config.moveSpeed; // Maximum speed of movement
+    this.acceleration = 2; // Acceleration rate
+    this.movementX = 0;
+    this.movementY = 0;
   }
-  update() {
+  steerCharacter() {
+    this.steerSpeed = 1;
+
+    // Update target position based on input
     if (this.keyA.isDown) {
-      this.gameObject.x -= this.moveSpeed; // Adjust velocity as needed
+      this.movementX = lerp(this.movementX, -this.acceleration, 0.1);
     } else if (this.keyD.isDown) {
-      this.gameObject.x += this.moveSpeed;
+      this.movementX = lerp(this.movementX, this.acceleration, 0.1);
+    } else {
+      this.movementX = lerp(this.movementX, 0, 0.1);
     }
     if (this.keyW.isDown) {
-      this.gameObject.y -= this.moveSpeed; // Adjust velocity as needed
-    } else if (this.keyS.isDown) {
-      this.gameObject.y += this.moveSpeed;
+      this.movementY = lerp(this.movementY, -this.acceleration, 0.1);
+    }
+    if (this.keyS.isDown) {
+      this.movementY = lerp(this.movementY, this.acceleration, 0.1);
+    } else {
+      this.movementY = lerp(this.movementY, 0, 0.1);
+    }
+
+    this.gameObject.x += this.movementX;
+    this.gameObject.y += this.movementY;
+  }
+  update() {
+    this.steerCharacter();
+    // Update target position based on input
+    if (this.keyA.isDown) {
+      this.targetX -= this.acceleration;
+    }
+    if (this.keyD.isDown) {
+      this.targetX += this.acceleration;
+    }
+    if (this.keyW.isDown) {
+      this.targetY -= this.acceleration;
+    }
+    if (this.keyS.isDown) {
+      this.targetY += this.acceleration;
     }
   }
 }
