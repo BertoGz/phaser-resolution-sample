@@ -23,7 +23,7 @@ function roundToPrecision(value, precision) {
 
 class Scene extends Phaser.Scene {
   preload() {
-    //this.game.renderer.setTextureFilter(Phaser.Textures.FilterMode.LINEAR)
+
     // load game assets
     this.load.spritesheet("char_sprite", "./assets/monster-ghost.png", {
       frameWidth: 32,
@@ -39,7 +39,7 @@ class Scene extends Phaser.Scene {
   create() {
     //create camera
     this.camera = new SmoothCamera(this, 0, 0);
-    //   this.camera.roundPixels = false;
+
 
     this.camera.setZoom(UPSCALE_FACTOR);
 
@@ -74,11 +74,11 @@ class Scene extends Phaser.Scene {
     const tree = new Phaser.GameObjects.Image(this, 100, 100, "tree");
     trees.push(tree);
     // create player
-    this.player = new Player(this, 0, 0, { moveSpeed: 1 });
+    this.player = new Player(this, 0, 0, { moveSpeed:3 });
     this.player.setDepth(10);
-    this.camera.startFollow(this.player, false, 0.05);
-    //set player as camera target
-    //this.camera.setTarget(this.player, 1);
+    this.camera.startFollow(this.player, false, 0.01);
+
+
   }
   postDraw() {
     const newCam = {
@@ -104,26 +104,21 @@ class Scene extends Phaser.Scene {
     true &&
       this.renderTexture.draw(
         this.player,
-        this.player.x - newCam.x,
-        this.player.y - newCam.y
+        Math.round(this.player.x) - newCam.x,
+        Math.round(this.player.y) - newCam.y
       );
     this.renderTexture.endDraw();
     const diffX = Math.round(newCam.x) - this.camera.scrollX;
     const diffY = Math.round(newCam.y) - this.camera.scrollY;
-    this.renderTexture.x = diffX; // roundTo4Halfs(diffX, 2);
-    this.renderTexture.y = diffY; //roundTo4Halfs(diffY, 2);
-    //this.renderTexture.
+    this.renderTexture.x = diffX;
+    this.renderTexture.y = diffY;
   }
   update(time, delta) {
     this.player.update(time, delta);
-
-    //  this.camera.scrollX = roundTo4Halfs(this.camera.scrollX, UPSCALE_FACTOR-1);
-    //  this.camera.scrollY = roundTo4Halfs(this.camera.scrollY, UPSCALE_FACTOR-1);
     requestAnimationFrame(() => {
       this.postDraw();
     });
 
-    //  this.renderTexture.y = .5
   }
   preUpdate() {}
 }
