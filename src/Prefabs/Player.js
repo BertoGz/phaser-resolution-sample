@@ -3,7 +3,7 @@ import { lerp } from "../Functions/lerp";
 class MovementHandler {
   constructor(gameObject, config = { moveSpeed: 1 }) {
     this.gameObject = gameObject;
-    // this.moveSpeed = config.moveSpeed;
+
     this.keyA = gameObject.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.A
     );
@@ -17,7 +17,7 @@ class MovementHandler {
       Phaser.Input.Keyboard.KeyCodes.S
     );
     this.maxSpeed = config.moveSpeed; // Maximum speed of movement
-    this.acceleration = 2; // Acceleration rate
+
     this.movementX = 0;
     this.movementY = 0;
   }
@@ -26,17 +26,17 @@ class MovementHandler {
 
     // Update target position based on input
     if (this.keyA.isDown) {
-      this.movementX = lerp(this.movementX, -this.acceleration, 0.1);
+      this.movementX = lerp(this.movementX, -this.maxSpeed, 0.1);
     } else if (this.keyD.isDown) {
-      this.movementX = lerp(this.movementX, this.acceleration, 0.1);
+      this.movementX = lerp(this.movementX, this.maxSpeed, 0.1);
     } else {
       this.movementX = lerp(this.movementX, 0, 0.1);
     }
     if (this.keyW.isDown) {
-      this.movementY = lerp(this.movementY, -this.acceleration, 0.1);
+      this.movementY = lerp(this.movementY, -this.maxSpeed, 0.1);
     }
     if (this.keyS.isDown) {
-      this.movementY = lerp(this.movementY, this.acceleration, 0.1);
+      this.movementY = lerp(this.movementY, this.maxSpeed, 0.1);
     } else {
       this.movementY = lerp(this.movementY, 0, 0.1);
     }
@@ -46,19 +46,6 @@ class MovementHandler {
   }
   update() {
     this.steerCharacter();
-    // Update target position based on input
-    if (this.keyA.isDown) {
-      this.targetX -= this.acceleration;
-    }
-    if (this.keyD.isDown) {
-      this.targetX += this.acceleration;
-    }
-    if (this.keyW.isDown) {
-      this.targetY -= this.acceleration;
-    }
-    if (this.keyS.isDown) {
-      this.targetY += this.acceleration;
-    }
   }
 }
 export default class Player extends Phaser.GameObjects.Image {
