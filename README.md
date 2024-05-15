@@ -1,6 +1,6 @@
-# Phaser Resolution Sample
+# Phaser Smooth-Pixel Example
 
-Welcome to Phaser Resolution Sample! I built this demo to understand how to build a pixel-perfect game.
+Welcome to the Phaser Smooth-Pixel Example! This showcase was created to delve into the nuances of operating within a pixel-perfect environment while utilizing a fluid game camera.
 
 ## Installation
 
