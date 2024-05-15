@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import Player from "./Prefabs/Player";
-import SmoothCamera from "./Classes/SmoothCamera";
+import PhaserCamera from "./Classes/PhaserCamera";
 import PixelPerfectRenderTexture from "./Classes/PixelPerfectRenderTexture";
 const UPSCALE_FACTOR = 4;
 const GAME_WIDTH = 360 * UPSCALE_FACTOR;
@@ -25,7 +25,7 @@ class Scene extends Phaser.Scene {
 
   create() {
     //create camera
-    this.camera = new SmoothCamera(this, 0, 0);
+    this.camera = new PhaserCamera(this, 0, 0);
 
     this.camera.setZoom(UPSCALE_FACTOR);
 
